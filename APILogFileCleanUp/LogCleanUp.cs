@@ -12,38 +12,54 @@ namespace APILogFileCleanUp
         static void Main(string[] args)
         {
 
-            string rootPath = @"C:\Users\eddie.kilgore\CleanUpTest\Test2";
-   
+            string rootPath = @"C:\Users\eddie.kilgore\CleanUpTest\Test2";//What it will be=> @"C:\inetpub\wwwroot\_Log";
+           
             bool directoryExists = Directory.Exists(rootPath);
             if (directoryExists)
             {
-                var files = Directory.GetFiles(rootPath);
+               // var files = Directory.GetFiles(rootPath);
+                var files = Directory.GetFiles(rootPath,"*.txt");
                 Console.WriteLine("The directory exists");
                 foreach (var file in files)
                 {
                     var info = new FileInfo(file);
-                    var creationTime = info.LastWriteTime;
-                    Console.WriteLine(creationTime);
-                    if (creationTime < DateTime.Now.AddDays(-20))
-                    {
-                        Console.WriteLine(Path.GetFileName(file));
-                        Console.WriteLine("YUHT");
+                    var LastWriteTime = info.LastWriteTime;
+                    Console.WriteLine(LastWriteTime);
+                    StreamWriter log;
 
-                      // File.Delete(file);
-                    }
-                    else
+                    if (LastWriteTime < DateTime.Now.AddDays(-5))
                     {
-                        Console.WriteLine("Nah");
-
+                       
+                        //Console.WriteLine(Path.GetFileName(file));//Don't need
+                        //Console.WriteLine("YUHT");
+                        if (!File.Exists("logfile.txt"))
+                        {
+                            log = new StreamWriter("logfile.txt");
+                        }
+                        else
+                        {
+                            log = File.AppendText("logfile.txt");
+                        }
+                        log.Write(Path.GetFileName(file));
+                        log.WriteLine(" "+DateTime.Now);
+                        log.WriteLine();
+                        log.Close();
+                        File.Delete(file);
                     }
+                    //else
+                    //{
+                    //    Console.WriteLine("Nah");
+                       
+                    //}
+                  
                 }
             }
             else
             {
                 Console.WriteLine("The directory does not exists");
             }
-
-            Console.ReadLine();
+           
+            Console.ReadLine();//Will have to remove so it closes at finish.
         }
     }
 }
